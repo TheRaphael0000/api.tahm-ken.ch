@@ -3,7 +3,7 @@
 ## dev setup
 
 requirements:
-- docker
+- docker or redis
 - python
 
 ```bash
