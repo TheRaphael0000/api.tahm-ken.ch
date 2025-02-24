@@ -1,19 +1,25 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from riot_api import query
 import os
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 app = FastAPI()
+limiter = Limiter(key_func=get_remote_address, storage_uri=f"redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}/n")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.get("/")
 def root():
     return {"version": os.getenv("VERSION")}
 
 @app.get("/challenges_player_data/{region}/{gameNamesTags}")
-def account_by_riot_id_dev(region:str, gameNamesTags: str, masteries: bool = False):
+@limiter.limit("15/minute")
+def account_by_riot_id_dev(request: Request, region:str, gameNamesTags: str, masteries: bool = False):
     accounts = []
     gameNamesParsed = [gameNameTag.split("-") for gameNameTag in gameNamesTags.split(",")]
 
-    print(masteries)
     for gameName, tagLine in gameNamesParsed:
         try:
             data = {}
