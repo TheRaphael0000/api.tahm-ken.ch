@@ -1,0 +1,10 @@
+services:  
+  redis:
+    container_name: redis
+    image: redis:latest
+    volumes:
+      - ./redis/redis.conf:/redis.conf
+    command: ["redis-server", "/redis.conf"]
+    ports:
+      - 6379:6379
+    restart: unless-stopped
