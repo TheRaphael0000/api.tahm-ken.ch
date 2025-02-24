@@ -1,16 +1,15 @@
 services:
   api:
-    container_name: api
+    container_name: tahmkenchapi
     build: .
     env_file:
       - .env
     environment: # override .env since we want to use the redis from below
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    ports:
-      - 80:80
     networks:
       - redis-network
+      - nginx
     restart: unless-stopped
 
   redis:
@@ -23,3 +22,6 @@ services:
 
 networks:
   redis-network:
+  nginx:
+    external: true
+    name: nginx
