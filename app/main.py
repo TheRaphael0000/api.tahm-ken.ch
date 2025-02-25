@@ -25,7 +25,8 @@ def account_by_riot_id_dev(request: Request, region:str, gameNamesTags: str, mas
             data = {}
             data["account"] = account_by_riot_id(gameName, tagLine)
             puuid = data["account"]["puuid"]
-            data["challenges"] = challenges = challenges_player_data(puuid, region)
+            data["challenges"] = challenges_player_data(puuid, region)
+            data["summoner"] = summoner(puuid, region)
             if masteries:
                 data["champion_masteries"] = champion_masteries(puuid, region)
             accounts.append(data)
@@ -41,3 +42,6 @@ def champion_masteries(puuid, region):
 
 def challenges_player_data(puuid, region):
     return query(f"/lol/challenges/v1/player-data/{puuid}", region, expire=10)
+
+def summoner(puuid, region):
+    return query(f"/lol/summoner/v4/summoners/by-puuid/{puuid}", region, expire=86400)
