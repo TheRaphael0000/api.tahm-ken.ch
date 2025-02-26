@@ -32,6 +32,9 @@ def query(url, region=None, expire=None):
         url, headers={"X-Riot-Token": os.getenv("RIOT_API")})
     data = response.json()
 
+    if str(response.status_code)[0] != '2':
+        raise HTTPException(status_code=response.status_code, detail=data)
+
     r.set(key, json.dumps(data))
     if expire:
         r.expire(key, expire)

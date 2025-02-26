@@ -14,13 +14,20 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 def root():
     return {"version": os.getenv("VERSION")}
 
-@app.get("/challenges_player_data/{region}/{gameNamesTags}")
+@app.get("/player_data/{region}/{gameNamesTags}")
 @limiter.limit("15/minute")
-def account_by_riot_id_dev(request: Request, region:str, gameNamesTags: str, masteries: bool = False):
+def player_data(request: Request, region:str, gameNamesTags: str, masteries: bool = False):
     accounts = []
-    gameNamesParsed = [gameNameTag.split("-") for gameNameTag in gameNamesTags.split(",")]
+    gameNamesParsed = [tuple(gameNameTag.split("-")) for gameNameTag in set(gameNamesTags.split(","))]
 
-    for gameName, tagLine in gameNamesParsed:
+    if len(gameNamesParsed) > 7:
+        return accounts
+
+    for gameNameTag in gameNamesParsed:
+        if len(gameNameTag) != 2:
+           continue
+        
+        gameName, tagLine = gameNameTag
         try:
             data = {}
             data["account"] = account_by_riot_id(gameName, tagLine)
@@ -30,7 +37,8 @@ def account_by_riot_id_dev(request: Request, region:str, gameNamesTags: str, mas
             if masteries:
                 data["champion_masteries"] = champion_masteries(puuid, region)
             accounts.append(data)
-        except:
+        except Exception as e:
+            print(e)
             pass
     return accounts
 
