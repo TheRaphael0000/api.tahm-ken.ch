@@ -16,7 +16,7 @@ def root():
 
 @app.get("/player_data/{region}/{gameNamesTags}")
 @limiter.limit("15/minute")
-def player_data(request: Request, region:str, gameNamesTags: str, masteries: bool = False):
+def player_data(request: Request, region:str, gameNamesTags: str):
     accounts = []
     gameNamesParsed = [tuple(gameNameTag.split("-")) for gameNameTag in set(gameNamesTags.split(","))]
 
@@ -34,8 +34,7 @@ def player_data(request: Request, region:str, gameNamesTags: str, masteries: boo
             puuid = data["account"]["puuid"]
             data["challenges"] = challenges_player_data(puuid, region)
             data["summoner"] = summoner(puuid, region)
-            if masteries:
-                data["champion_masteries"] = champion_masteries(puuid, region)
+            data["champion_masteries"] = champion_masteries(puuid, region)
             accounts.append(data)
         except Exception as e:
             print(e)
