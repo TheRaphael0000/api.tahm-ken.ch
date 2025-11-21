@@ -45,7 +45,7 @@ def account_by_riot_id(gameName, tagLine):
     return query(f"/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}")
 
 def champion_masteries(puuid, region):
-    return query(f"/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}", region, expire=86400)
+    return query(f"/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}", region, expire=600)
 
 def challenges_player_data(puuid, region):
     return query(f"/lol/challenges/v1/player-data/{puuid}", region, expire=10)
